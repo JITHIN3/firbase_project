@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
-class SignInPage extends StatelessWidget {
+import 'HomePage.dart';
+import 'Signup.dart';
+
+class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
 
   @override
+  State<SignInPage> createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  firebase_auth.FirebaseAuth firebaseAuth = firebase_auth.FirebaseAuth.instance;
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  bool circular = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold(resizeToAvoidBottomInset: false,
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
@@ -40,11 +54,11 @@ class SignInPage extends StatelessWidget {
             SizedBox(
               height: 15,
             ),
-            textItem(context, "Email"),
+            textItem(context, "Email", _emailController, false),
             SizedBox(
               height: 15,
             ),
-            textItem(context, "Password"),
+            textItem(context, "Password", _passwordController, true),
             SizedBox(
               height: 30,
             ),
@@ -59,12 +73,19 @@ class SignInPage extends StatelessWidget {
                   "Don't Have An Account? ",
                   style: TextStyle(color: Colors.white, fontSize: 15),
                 ),
-                Text(
-                  "Sign Up",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
+                InkWell( onTap: () {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (builder) => SignUpPage()),
+                          (route) => false);
+                },
+                  child: Text(
+                    "Sign Up",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
@@ -85,26 +106,56 @@ class SignInPage extends StatelessWidget {
   }
 
   Widget colorButton(context) {
-    return Container(
-      margin: EdgeInsets.only(left: 15, right: 15),
-      height: 60,
-      width: MediaQuery.of(context).size.width * 100,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        gradient: LinearGradient(
-          colors: [
-            Color(0xfffd746c),
-            Color(0xffff9868),
-            Color(0xfffd746c),
-          ],
+    return InkWell(
+      onTap: () async {
+        try {
+          firebase_auth.UserCredential userCredential =
+              await firebaseAuth.signInWithEmailAndPassword(
+                  email: _emailController.text,
+                  password: _passwordController.text);
+          print(userCredential.user!.email);
+          setState(() {
+            circular = false;
+          });
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (builder) => HomePage()),
+                  (route) => false);
+        } catch (e) {
+          final snackbar = SnackBar(
+            content: Text(
+              e.toString(),
+            ),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackbar);
+          setState(() {
+            circular = false;
+          });
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.only(left: 15, right: 15),
+        height: 60,
+        width: MediaQuery.of(context).size.width * 100,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          gradient: LinearGradient(
+            colors: [
+              Color(0xfffd746c),
+              Color(0xffff9868),
+              Color(0xfffd746c),
+            ],
+          ),
         ),
+        child: Center(
+            child: circular
+                ? CircularProgressIndicator()
+                :  Text(
+          "Sign In",
+          style: TextStyle(
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        )),
       ),
-      child: Center(
-          child: Text(
-        "Sign In",
-        style: TextStyle(
-            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-      )),
     );
   }
 
@@ -140,15 +191,16 @@ class SignInPage extends StatelessWidget {
     );
   }
 
-  Widget textItem(
-    context,
-    String labelText,
-  ) {
+  Widget textItem(context, String labelText, TextEditingController controller,
+      bool obscureText) {
     return Container(
       margin: EdgeInsets.only(left: 15, right: 15),
       width: double.infinity,
       height: 55,
       child: TextFormField(
+        style: TextStyle(color: Colors.white, fontSize: 17),
+        obscureText: obscureText,
+        controller: controller,
         decoration: InputDecoration(
           errorBorder: InputBorder.none,
           disabledBorder: InputBorder.none,
