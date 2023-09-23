@@ -1,4 +1,5 @@
 import 'package:firbase_project/Pages/HomePage.dart';
+import 'package:firbase_project/Pages/PhoneAuthPage.dart';
 import 'package:firbase_project/Service/Auth_Service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
@@ -17,7 +18,7 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool circular = false;
-  AuthClass authClass =AuthClass();
+  AuthClass authClass = AuthClass();
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +41,22 @@ class _SignUpPageState extends State<SignUpPage> {
               height: 20,
             ),
             buttomItem(
-                context, "lib/assets/google.png", "Continue With Google", 25,()async{
-                  await authClass.googleSignIn(context);
+                context, "lib/assets/google.png", "Continue With Google", 25,
+                () async {
+              await authClass.googleSignIn(context);
             }),
             SizedBox(
               height: 15,
             ),
             buttomItem(
-                context, "lib/assets/phone.png", "Continue WIth Phone", 30,(){}),
+                context, "lib/assets/phone.png", "Continue WIth Phone", 30, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (builder) => PhoneAuthPage(),
+                ),
+              );
+            }),
             SizedBox(
               height: 15,
             ),
@@ -159,8 +168,10 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget buttomItem(context, String imagepath, String buttonName, double size,VoidCallback onTap) {
-    return InkWell(onTap:onTap,
+  Widget buttomItem(context, String imagepath, String buttonName, double size,
+      VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
       child: Container(
         margin: EdgeInsets.only(left: 10, right: 10),
         width: MediaQuery.of(context).size.width * 60,

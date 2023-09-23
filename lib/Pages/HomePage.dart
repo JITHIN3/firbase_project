@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(actions: [
       IconButton(
         onPressed: () async {
-          await authClass.logOut();
+          await authClass.signOut(context);
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
