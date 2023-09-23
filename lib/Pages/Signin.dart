@@ -1,3 +1,4 @@
+import 'package:firbase_project/Service/Auth_Service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
@@ -16,6 +17,7 @@ class _SignInPageState extends State<SignInPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool circular = false;
+  AuthClass authClass = AuthClass();
 
   @override
   Widget build(BuildContext context) {
@@ -38,12 +40,14 @@ class _SignInPageState extends State<SignInPage> {
               height: 20,
             ),
             buttomItem(
-                context, "lib/assets/google.png", "Continue With Google", 25),
+                context, "lib/assets/google.png", "Continue With Google", 25,(){
+                  authClass.googleSignIn(context);
+            }),
             SizedBox(
               height: 15,
             ),
             buttomItem(
-                context, "lib/assets/phone.png", "Continue WIth Phone", 30),
+                context, "lib/assets/phone.png", "Continue WIth Phone", 30,(){}),
             SizedBox(
               height: 15,
             ),
@@ -159,33 +163,35 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  Widget buttomItem(context, String imagepath, String buttonName, double size) {
-    return Container(
-      margin: EdgeInsets.only(left: 10, right: 10),
-      width: MediaQuery.of(context).size.width * 60,
-      height: 60,
-      child: Card(
-        color: Colors.black,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-            side: BorderSide(width: 1, color: Colors.grey)),
-        elevation: 10,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              imagepath,
-              height: size,
-              width: size,
-            ),
-            SizedBox(
-              width: 15,
-            ),
-            Text(
-              buttonName,
-              style: TextStyle(color: Colors.white, fontSize: 17),
-            ),
-          ],
+  Widget buttomItem(context, String imagepath, String buttonName, double size,VoidCallback onTap) {
+    return InkWell(onTap:onTap,
+      child: Container(
+        margin: EdgeInsets.only(left: 10, right: 10),
+        width: MediaQuery.of(context).size.width * 60,
+        height: 60,
+        child: Card(
+          color: Colors.black,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+              side: BorderSide(width: 1, color: Colors.grey)),
+          elevation: 10,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                imagepath,
+                height: size,
+                width: size,
+              ),
+              SizedBox(
+                width: 15,
+              ),
+              Text(
+                buttonName,
+                style: TextStyle(color: Colors.white, fontSize: 17),
+              ),
+            ],
+          ),
         ),
       ),
     );
