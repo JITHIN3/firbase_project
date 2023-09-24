@@ -44,6 +44,8 @@ dependencies:
   cloud_firestore: ^4.9.2
   flutter_secure_storage: ^9.0.0
   otp_text_field: ^1.1.3
+  fluttertoast: ^8.2.2
+
 
 
 dev_dependencies:
@@ -72,6 +74,7 @@ flutter:
   assets:
       - lib/assets/google.png
       - lib/assets/phone.png
+      - lib/assets/profile.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
