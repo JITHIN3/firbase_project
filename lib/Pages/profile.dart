@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../Service/Auth_Service.dart';
+import 'Signup.dart';
+
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
 
@@ -13,6 +16,7 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   final ImagePicker _picker = ImagePicker();
   XFile?  image;
+  AuthClass authClass = AuthClass();
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +58,19 @@ class _ProfileState extends State<Profile> {
                       size: 30,
                     ))
               ],
-            )
+            ),
+                SizedBox(height:30),
+                Center(child: IconButton(
+                  onPressed: () async {
+                    await authClass.signOut(context);
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (builder) => SignUpPage(),
+                        ),
+                            (route) => false);
+                  },
+                 icon:Icon(Icons.logout_outlined,size:35,color: Colors.red,)),)
           ]),
         ),
       ),

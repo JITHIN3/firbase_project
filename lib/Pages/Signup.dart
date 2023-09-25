@@ -124,10 +124,12 @@ class _SignUpPageState extends State<SignUpPage> {
           setState(() {
             circular = false;
           });
+
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (builder) => HomePage()),
               (route) => false);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Login Success")));
         } catch (e) {
           final snackbar = SnackBar(
             content: Text(
