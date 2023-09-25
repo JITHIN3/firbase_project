@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firbase_project/Custom/TodoCard.dart';
 import 'package:firbase_project/Pages/AddTodo.dart';
 import 'package:firbase_project/Pages/Signup.dart';
+import 'package:firbase_project/Pages/profile.dart';
+import 'package:firbase_project/Pages/view_data.dart';
 import 'package:firbase_project/Service/Auth_Service.dart';
 import 'package:flutter/material.dart';
-
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,6 +16,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   AuthClass authClass = AuthClass();
+  final Stream<QuerySnapshot> _stream =
+      FirebaseFirestore.instance.collection("Todo").snapshots();
+  List<Select> selected = [];
 
   @override
   Widget build(BuildContext context) {
@@ -90,58 +95,106 @@ class _HomePageState extends State<HomePage> {
         ),
         BottomNavigationBarItem(
           label: "",
-          icon: Icon(
-            Icons.settings,
-            size: 32,
-            color: Colors.white,
+          icon: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (builder) => Profile(),
+                ),
+              );
+            },
+            child: Icon(
+              Icons.settings,
+              size: 32,
+              color: Colors.white,
+            ),
           ),
         ),
       ]),
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Column(children: [
-            TodoCard(
-              title: "Wake Up Bro",
-              check: true,
-              iconColor: Colors.red,
-              iconBgColor: Colors.white,
-              iconData: Icons.alarm,
-              time: "10 AM",
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            TodoCard(
-              title: "Buy Some Food",
-              check: false,
-              iconColor: Colors.white,
-              iconBgColor: Color(0xffff19733),
-              iconData: Icons.local_grocery_store,
-              time: "12 PM",
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            TodoCard(
-              title: "Testing Something",
-              check: true,
-              iconColor: Colors.white,
-              iconBgColor: Color(0xffd3c2b9),
-              iconData: Icons.audiotrack,
-              time: "2 PM",
-            ),
-            SizedBox(
-              height: 10,
-            ),
-          ]),
-        ),
-      ),
+      body: StreamBuilder(
+          stream: _stream,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return ListView.builder(
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                  IconData? iconData;
+                  Color? iconColor;
+                  Map<String, dynamic> document =
+                      snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                  switch (document["category"]) {
+                    case "Work":
+                      iconData = Icons.work;
+                      iconColor = Colors.red;
+                      break;
+                    case "WorkOut":
+                      iconData = Icons.alarm;
+                      iconColor = Colors.teal;
+                      break;
+                    case "Food":
+                      iconData = Icons.local_grocery_store;
+                      iconColor = Colors.blue;
+                      break;
+                    case "Design":
+                      iconData = Icons.audiotrack;
+                      iconColor = Colors.grey;
+                      break;
+                    case "Run":
+                      iconData = Icons.run_circle_outlined;
+                      iconColor = Colors.grey;
+                      break;
+                    default:
+                      iconData = Icons.do_not_disturb_alt_outlined;
+                      iconColor = Colors.red;
+                  }
+                  selected.add(
+                    Select(
+                        id: snapshot.data!.docs[index].id, checkValue: false),
+                  );
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (builder) => ViewData(
+                              document: document,
+                              id: snapshot.data!.docs[index].id),
+                        ),
+                      );
+                    },
+                    child: TodoCard(
+                      title: document["title"] == null
+                          ? "No Title"
+                          : document["title"],
+                      check: selected[index].checkValue,
+                      iconColor: iconColor,
+                      iconBgColor: Colors.white,
+                      iconData: iconData,
+                      time: "10 AM",
+                      index: index,
+                      onChange: onchange,
+                    ),
+                  );
+                });
+          }),
     );
   }
 
+  void onchange(int index) {
+    selected[index].checkValue = selected[index].checkValue;
+  }
+}
+
+class Select {
+  String? id;
+  bool? checkValue = false;
+
+  Select({this.id, this.checkValue});
 }
 //Future use
 // IconButton(
