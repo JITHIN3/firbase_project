@@ -7,13 +7,11 @@ import 'package:firbase_project/Pages/view_data.dart';
 import 'package:firbase_project/Service/Auth_Service.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatefulWidget {
+  class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
-
   @override
   State<HomePage> createState() => _HomePageState();
 }
-
 class _HomePageState extends State<HomePage> {
   AuthClass authClass = AuthClass();
   final Stream<QuerySnapshot> _stream =
